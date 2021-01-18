@@ -1,0 +1,36 @@
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: argocd-ingress
+  namespace: argocd
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/hostname: argocd.danmanners.io
+spec:
+  rules:
+    - host: argocd.danmanners.io
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: argocd-server
+              servicePort: http
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: rocketchat-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/hostname: rocketchat.danmanners.io
+spec:
+  rules:
+    - host: rocketchat.danmanners.io
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: rocketchat-1604818659-rocketchat
+              servicePort: http

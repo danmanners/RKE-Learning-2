@@ -1,0 +1,174 @@
+---
+- name: Prepare centos hosts for RKE
+  hosts: rke-hosts
+  remote_user: centos
+  tags:
+    - init
+  vars:
+    kernel_modules:
+      - br_netfilter
+      - ip6_udp_tunnel
+      - ip_set
+      - ip_set_hash_ip
+      - ip_set_hash_net
+      - iptable_filter
+      - iptable_nat
+      - iptable_mangle
+      - iptable_raw
+      - nf_conntrack_netlink
+      - nf_conntrack
+      - nf_conntrack_ipv4
+      - nf_defrag_ipv4
+      - nf_nat
+      - nf_nat_ipv4
+      - nf_nat_masquerade_ipv4
+      - nfnetlink
+      - udp_tunnel
+      - veth
+      - vxlan
+      - x_tables
+      - xt_addrtype
+      - xt_conntrack
+      - xt_comment
+      - xt_mark
+      - xt_multiport
+      - xt_nat
+      - xt_recent
+      - xt_set
+      - xt_statistic
+      - xt_tcpudp
+
+  tasks:
+    - name: Install Docker CE
+      block:
+      - name: Install Docker-CE-19.03.14
+        vars:
+          docker_edition: 'ce'
+          docker_package: "docker-{{ docker_edition }}-19.03.14"
+          docker_package_state: present
+          docker_service_state: started
+          docker_service_enabled: true
+          docker_restart_handler_state: restarted
+        include_role:
+          name: geerlingguy.docker
+      become: true
+
+    - name: Load kernel modules for RKE
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ kernel_modules }}"
+      become: true
+
+    - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+      shell: |
+        swapoff -a
+      become: true
+     
+    - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+.*)$'
+        replace: '# \1'
+      become: true
+
+    - name: Modify sysctl entries
+      sysctl:
+        name: '{{ item.key }}'
+        value: '{{ item.value }}'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      become: true
+      with_items:
+        - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
+        - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
+        - {key: net.ipv4.ip_forward,  value: 1}
+
+    - name: Disable SELinux
+      ansible.posix.selinux:
+        state: disabled
+      become: true
+
+- name: Create user with passwordless sudo for RKE
+  hosts: rke-hosts
+  remote_user: centos
+  tags:
+    - rke_user
+  vars:
+    user: rke
+  tasks:
+    - name: Add {{ user }} admin user
+      user:
+        name: '{{ user }}'
+        shell: /bin/bash
+      become: true
+     
+    - name: Create sudo file
+      file:
+        path: /etc/sudoers.d/{{ user }}
+        state: touch
+      become: true
+    
+    - name: Give {{ user }} user passwordless sudo
+      lineinfile:
+        path: /etc/sudoers.d/{{ user }}
+        state: present
+        line: '{{ user }} ALL=(ALL:ALL) NOPASSWD: ALL'
+      become: true
+     
+    - name: Set authorized key taken from file
+      authorized_key:
+        user: '{{ user }}'
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+      become: true
+
+    - name: adding existing user '{{ user }}' to group sudo
+      user:
+        name: '{{ user }}'
+        groups: [ 'docker' ]
+        append: yes
+      become: true
+
+- name: Ensure longhorn volumes are good to go
+  hosts: workers
+  remote_user: centos
+  tags:
+    - longhorn
+  tasks:
+    - name: Create a new ext4 primary partition
+      community.general.parted:
+        device: /dev/sdb
+        number: 1
+        state: present
+        fs_type: ext4
+      become: true
+
+    - name: Create a ext4 filesystem on /dev/sdb1
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/sdb1
+      become: true
+
+    - name: Create the longhorn directory if it does not exist
+      ansible.builtin.file:
+        path: /var/lib/longhorn
+        state: directory
+        mode: '0755'
+      become: true
+
+    - name: Mount the /dev/sdb1 device for longhorn
+      ansible.posix.mount:
+        path: /var/lib/longhorn
+        src: /dev/sdb1
+        state: mounted
+        fstype: ext4
+        opts: noatime
+      become: true
+
+    - name: Install iscsi-initiator
+      yum:
+        name: iscsi-initiator-utils
+        state: latest
+      become: true
