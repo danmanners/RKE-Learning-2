@@ -1,3 +1,6 @@
 # Files
 *.rkestate
 kube_config_cluster.yml
+
+# Cert-Manager
+cert-manager/digitalocean-dns01.yaml

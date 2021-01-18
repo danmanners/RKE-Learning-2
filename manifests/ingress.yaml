@@ -1,3 +1,5 @@
+# This is for Traefik v1.7.2; it will not work for Traefik v2+
+# I am leaving this here as a comparsion.
 ---
 kind: Ingress
 apiVersion: extensions/v1beta1
