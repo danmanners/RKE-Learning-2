@@ -1,0 +1,74 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-oss
+  labels:
+    run: nexus-oss
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 8081
+    protocol: TCP
+  - name: registry
+    port: 5001
+    protocol: TCP
+  selector:
+    run: nexus-oss
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: nexus-oss-cert
+spec:
+  commonName: nexus.danmanners.io
+  secretName: nexus-oss-cert
+  dnsNames:
+    - nexus.danmanners.io
+    - registry.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nexus-oss
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`nexus.danmanners.io`)
+      kind: Rule
+      services:
+        - name: nexus-oss
+          port: 8081
+    - match: Host(`registry.danmanners.io`)
+      kind: Rule
+      services:
+        - name: nexus-oss
+          port: 5001
+  tls:
+    secretName: nexus-oss-cert
+# ---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   annotations:
+#     external-dns.alpha.kubernetes.io/hostname: nexus.danmanners.io
+#     kubernetes.io/ingress.class: traefik
+#   labels:
+#     run: nexus-oss
+#   name: nexus-oss-ingress
+#   namespace: default
+# spec:
+#   rules:
+#     - host: nexus.danmanners.io
+#       http:
+#         paths:
+#           - path: /
+#             pathType: ImplementationSpecific
+#             backend:
+#               serviceName: nexus-oss
+#               servicePort: 8081

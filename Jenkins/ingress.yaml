@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-ce
+  labels:
+    run: jenkins-ce
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 8080
+    protocol: TCP
+  - name: jnlp-agents
+    port: 50000
+    protocol: TCP
+  selector:
+    run: jenkins-ce
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: jenkins-cert
+spec:
+  commonName: jenkins.danmanners.io
+  secretName: jenkins-cert
+  dnsNames:
+    - jenkins.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jenkins
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`jenkins.danmanners.io`)
+      kind: Rule
+      services:
+        - name: jenkins-ce
+          port: 8080
+  tls:
+    secretName: jenkins-cert

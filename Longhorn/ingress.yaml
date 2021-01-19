@@ -1,0 +1,31 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: longhorn-frontend-cert
+  namespace: longhorn-system
+spec:
+  commonName: longhorn-dashboard.danmanners.io
+  secretName: longhorn-frontend-cert
+  dnsNames:
+    - longhorn-dashboard.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: longhorn-frontend
+  namespace: longhorn-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`longhorn-dashboard.danmanners.io`)
+      kind: Rule
+      services:
+        - name: longhorn-frontend
+          port: 80
+  tls:
+    secretName: longhorn-frontend-cert

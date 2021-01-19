@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexus-oss
+spec:
+  selector:
+    matchLabels:
+      run: nexus-oss
+  serviceName: "nexus-oss"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: nexus-oss
+    spec:
+      terminationGracePeriodSeconds: 60
+      initContainers:
+      - name: init-nexus
+        image: busybox
+        command: ['sh', '-c', 'chown -R 200:200 /nexus-data']
+        volumeMounts:
+        - name: nexus-data
+          mountPath: /nexus-data
+      containers:
+      - name: nexus-oss
+        image: sonatype/nexus3:3.29.2
+        ports:
+        - name: web
+          containerPort: 8081
+        - name: registry
+          containerPort: 5001
+        volumeMounts:
+        - name: nexus-data
+          mountPath: /nexus-data
+        env:
+          - name: INSTALL4J_ADD_VM_PARAMS
+            value: "-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g"
+        resources:
+          limits:
+            cpu: "4"
+          requests:
+            cpu: "1"
+  volumeClaimTemplates:
+  - metadata:
+      name: nexus-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 20Gi
