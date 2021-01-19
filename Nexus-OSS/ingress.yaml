@@ -51,6 +51,7 @@ spec:
           port: 5001
   tls:
     secretName: nexus-oss-cert
+# OLD Traefik v1.7x Ingress
 # ---
 # apiVersion: extensions/v1beta1
 # kind: Ingress

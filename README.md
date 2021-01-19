@@ -22,6 +22,7 @@ $ kubectl create namespace longhorn-system
 $ helm install longhorn longhorn/longhorn \
     --namespace longhorn-system \
     --version 1.1.0
+$ kubectl apply -f Longhorn/ingress.yaml
 
 # Install Traefik v2
 $ helm repo add traefik https://helm.traefik.io/traefik
@@ -40,4 +41,12 @@ $ helm install cert-manager jetstack/cert-manager \
 
 # Set up Cert-Manager DigitalOcean DNS Issuer
 $ kubectl apply -f cert-manager/digitalocean-dns01.yaml
+
+# Install Jenkins
+$ kubectl apply -f Jenkins/sts.yaml -f Jenkins/rbac.yaml -f Jenkins/ingress.yaml
+$ kubectl exec -it jenkins-ce-0 -- /bin/cat /var/jenkins_home/secrets/initialAdminPassword
+
+# Install Nexus-OSS
+$ kubectl apply -f Nexus-OSS/sts.yaml -f Nexus-OSS/ingress.yaml
+$ kubectl exec -it nexus-oss-0 -- /bin/cat /nexus-data/admin.password
 ```
