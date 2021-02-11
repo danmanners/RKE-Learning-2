@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: sonarqube
-        image: sonarqube:8.6.0-community
+        image: sonarqube:8.6.1-community
         ports:
         - containerPort: 9000
           name: web
@@ -31,12 +31,12 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: sonar-postgres-add
-                key: newdbuser
+                key: pgrootuser
           - name: SONARQUBE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: sonar-postgres-add
-                key: newdbpass
+                key: pgpassword
           - name: SONARQUBE_JDBC_URL
             valueFrom:
               secretKeyRef:
