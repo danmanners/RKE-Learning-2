@@ -155,7 +155,7 @@ kubernetes_version: "v1.19.6-rancher1-1"
 private_registries:
   - url: docker.io
     user: danielmanners
-    password: e0b7dd76-a318-4c0c-b5c4-000bf3189f8f
+    password: Definitely-Not-A-Real-API-Password
 ingress:
   provider: none
 cluster_name: homelab

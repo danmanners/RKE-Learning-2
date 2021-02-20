@@ -1,6 +1,6 @@
 ---
 - name: Prepare centos hosts for RKE
-  hosts: rke-hosts
+  hosts: rke_hosts
   remote_user: centos
   tags:
     - init
@@ -41,17 +41,19 @@
   tasks:
     - name: Install Docker CE
       block:
-      - name: Install Docker-CE-19.03.14
+      - name: Install Docker-CE-19.03.15
         vars:
           docker_edition: 'ce'
-          docker_package: "docker-{{ docker_edition }}-19.03.14"
+          docker_package: "docker-{{ docker_edition }}-19.03.15"
           docker_package_state: present
           docker_service_state: started
           docker_service_enabled: true
           docker_restart_handler_state: restarted
         include_role:
           name: geerlingguy.docker
-      become: true
+          apply:
+            become: true
+      # become: true
 
     - name: Load kernel modules for RKE
       modprobe:
@@ -64,7 +66,7 @@
       shell: |
         swapoff -a
       become: true
-     
+
     - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
       replace:
         path: /etc/fstab
@@ -91,7 +93,7 @@
       become: true
 
 - name: Create user with passwordless sudo for RKE
-  hosts: rke-hosts
+  hosts: rke_hosts
   remote_user: centos
   tags:
     - rke_user
@@ -103,7 +105,7 @@
         name: '{{ user }}'
         shell: /bin/bash
       become: true
-     
+
     - name: Create sudo file
       file:
         path: /etc/sudoers.d/{{ user }}
@@ -116,7 +118,7 @@
         state: present
         line: '{{ user }} ALL=(ALL:ALL) NOPASSWD: ALL'
       become: true
-     
+
     - name: Set authorized key taken from file
       authorized_key:
         user: '{{ user }}'

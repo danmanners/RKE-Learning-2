@@ -3,8 +3,18 @@
 Here are the steps taken to get the cluster from nothing to running
 
 ```bash
+# Ensure you install the required Ansible Galaxy Modules
+$ ansible-galaxy collection install ansible.posix
+$ ansible-galaxy collection install community.general
+$ ansible-galaxy install geerlingguy.docker
+
 # Provision all of our hosts
 $ ansible-playbook -i inventory.ini rke-deploy-playbook.yaml
+
+# Get the correct RKE Binary
+$ sudo wget https://github.com/rancher/rke/releases/download/v1.2.5/rke_linux-amd64 \
+    -O /usr/local/bin/rke
+$ sudo chmod a+x /usr/local/bin/rke
 
 # Ensure that the RKE cluster is up
 $ rke up
