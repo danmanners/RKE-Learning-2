@@ -20,6 +20,7 @@ spec:
         volumeMounts:
           - name: snr-psql-data
             mountPath: /var/lib/postgresql/data
+            subPath: postgres
         env:
         - name: POSTGRES_PASSWORD
           valueFrom:
@@ -37,8 +38,7 @@ spec:
   - metadata:
       name: snr-psql-data
     spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: longhorn-xfs
+      accessModes: [ "ReadWriteMany" ]
       resources:
         requests:
-          storage: 5Gi
+          storage: 10Gi

@@ -1,0 +1,19 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'sonarqube'
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: Sonarqube
+        targetRevision: HEAD
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: sonarqube
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true

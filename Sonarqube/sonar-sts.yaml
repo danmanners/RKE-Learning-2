@@ -56,21 +56,24 @@ spec:
   - metadata:
       name: snr-data-pvc
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "longhorn-xfs"
+      accessModes: [ "ReadWriteMany" ]
       resources:
         requests:
           storage: 5Gi
   - metadata:
       name: snr-logs-pvc
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "longhorn-xfs"
+      accessModes: [ "ReadWriteMany" ]
       resources:
         requests:
           storage: 2Gi
   - metadata:
       name: snr-ext-pvc
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "longhorn-xfs"
+      accessModes: [ "ReadWriteMany" ]
       resources:
         requests:
           storage: 5Gi
