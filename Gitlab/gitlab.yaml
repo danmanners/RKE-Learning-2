@@ -32,7 +32,6 @@ spec:
           edition: ee
           application:
             create: false
-            links: []
             allowClusterRoles: true
           hosts:
             domain: danmanners.io
@@ -46,15 +45,13 @@ spec:
             tls: {}
             smartcard: {}
             kas: {}
-            pages: {}
           ingress:
-            enabled: false
+            enabled: true
             configureCertmanager: false
             annotations: 
               kubernetes.io/tls-acme: true
           gitlab:
             license: {}
-          initialRootPassword: {}
           psql:
             connectTimeout:
             password: {}
@@ -106,11 +103,8 @@ spec:
           appConfig:
             enableUsagePing: true
             enableSeatLink: true
-            enableImpersonation:
             defaultCanCreateGroup: true
             usernameChangingEnabled: true
-            issueClosingPattern:
-            defaultTheme:
             defaultProjectsFeatures:
               issues: true
               mergeRequests: true
@@ -119,7 +113,6 @@ spec:
               builds: true
             webhookTimeout:
             maxRequestDurationSeconds:
-            cron_jobs: {}
             contentSecurityPolicy:
               enabled: false
               report_only: true
@@ -179,64 +172,18 @@ spec:
               tmpBucket: tmp
             incomingEmail:
               enabled: false
-
-              host: "imap.gmail.com"
-              port: 993
-              ssl: true
-              startTls: false
-
-              password:
-
-                key: password
-              expungeDeleted: false
-              logger:
-                logPath: "/dev/stdout"
-              mailbox: inbox
-              idleTimeout: 60
             serviceDeskEmail:
               enabled: false
-
-              host: "imap.gmail.com"
-              port: 993
-              ssl: true
-              startTls: false
-
-              password:
-
-                key: password
-              expungeDeleted: false
-              logger:
-                logPath: "/dev/stdout"
-              mailbox: inbox
-              idleTimeout: 60
             ldap:
               preventSignin: false
               servers: {}
             gitlab_kas: {}
             omniauth:
               enabled: false
-              autoSignInWithProvider:
-              syncProfileFromProvider: []
-              syncProfileAttributes: ['email']
-              allowSingleSignOn: ['saml']
-              blockAutoCreatedUsers: true
-              autoLinkLdapUser: false
-              autoLinkSamlUser: false
-              autoLinkUser: []
-              externalProviders: []
-              allowBypassTwoFactor: []
-              providers: []
             sentry:
               enabled: false
-              dsn:
-              clientside_dsn:
-              environment:
             smartcard:
               enabled: false
-              CASecret:
-              clientCertificateRequiredHost:
-              sanExtensions: false
-              requiredForGitAccess: false
             initialDefaults: {}
           geo:
             enabled: false
@@ -255,48 +202,15 @@ spec:
               enabled: true
           registry:
             bucket: registry
-            certificate: {}
-            httpSecret: {}
-            notifications: {}
           pages:
             enabled: false
-            accessControl: false
-            path:
-            host:
-            port:
-            https: # default true
-            externalHttp: []
-            externalHttps: []
-            artifactsServer: true
-            objectStore:
-              enabled: true
-              bucket: gitlab-pages
-              connection: {}
-            apiSecret: {}
           runner:
             registrationToken: {}
           smtp:
             enabled: false
-            address: smtp.mailgun.org
-            port: 2525
-
-            password:
-
-              key: password
-            authentication: "plain"
-            starttls_auto: false
-            openssl_verify_mode: "peer"
           email:
-            from: ''
             display_name: GitLab
-            reply_to: ''
-            subject_suffix: ''
-            smime:
-              enabled: false
-
-              keyName: "tls.key"
-              certName: "tls.crt"
-          time_zone: UTC
+          time_zone: EST
           service:
             labels: {}
             annotations: {}
@@ -311,7 +225,6 @@ spec:
             image:
               repository: registry.gitlab.com/gitlab-org/build/cng/alpine-certificates
               tag: 20191127-r2
-            customCAs: []
           kubectl:
             image:
               repository: registry.gitlab.com/gitlab-org/build/cng/kubectl
@@ -330,8 +243,6 @@ spec:
             annotations: {}
           tracing:
             connection:
-
-
           extraEnv: {}
 
         upgradeCheck:
@@ -557,7 +468,28 @@ spec:
           testFramework:
             enabled: false
 
+        # CUSTOM - Required for separately managed certmanager
+        registry:
+          ingress:
+            tls:
+              secretName: gitlab-registry-tls
+
+        # CUSTOM - Required for separately managed certmanager
+        minio:
+          ingress:
+            tls:
+              secretName: gitlab-minio-tls
+
+        # CUSTOM - Required for separately managed certmanager
         gitlab:
+          gitlab-pages:
+            ingress:
+              tls:
+                secretName: gitlab-pages-tls
+          webservice:
+            ingress:
+              tls:
+                secretName: gitlab-webservice-tls
           task-runner:
             replicas: 1
             antiAffinityLabels:

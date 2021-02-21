@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: 'sonarqube'
+  namespace: argocd
 spec:
     project: default
     source:
@@ -12,6 +13,26 @@ spec:
     destination:
         server: 'https://kubernetes.default.svc'
         namespace: sonarqube
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'gitlab-deployment'
+  namespace: argocd
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: Gitlab
+        targetRevision: Gitlab
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: gitlab
     syncPolicy:
         automated:
             prune: true
