@@ -1,0 +1,504 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+spec:
+  destination:
+    namespace: gitlab
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://charts.gitlab.io/'
+    targetRevision: 4.8.4
+    chart: gitlab
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        ## NOTICE
+        # Due to the scope and complexity of this chart, all possible values are
+        # not documented in this file. Extensive documentation for these values
+        # and more can be found at https://gitlab.com/gitlab-org/charts/gitlab/
+
+        global:
+          common:
+            labels: {}
+          operator:
+            enabled: false
+            rollout:
+              autoPause: true
+          pod:
+            labels: {}
+          edition: ee
+          application:
+            create: false
+            allowClusterRoles: true
+          hosts:
+            domain: danmanners.io
+            hostSuffix:
+            https: true
+            externalIP:
+            ssh: ~
+            gitlab: {}
+            minio: {}
+            registry: {}
+            tls: {}
+            smartcard: {}
+            kas: {}
+          ingress:
+            enabled: true
+            configureCertmanager: false
+            annotations: 
+              kubernetes.io/tls-acme: true
+          gitlab:
+            license: {}
+          psql:
+            connectTimeout:
+            password: {}
+          redis:
+            password:
+              enabled: true
+          gitaly:
+            enabled: true
+            authToken: {}
+            internal:
+              names: ['default']
+            external: []
+            service:
+              name: gitaly
+              type: ClusterIP
+              externalPort: 8075
+              internalPort: 8075
+              tls:
+                externalPort: 8076
+                internalPort: 8076
+            tls:
+              enabled: false
+          praefect:
+            enabled: false
+            authToken: {}
+            autoMigrate: true
+            dbSecret: {}
+            virtualStorages:
+              - name: default
+                gitalyReplicas: 3
+                maxUnavailable: 1
+            psql:
+              sslMode: 'disable'
+            service:
+              name: praefect
+              type: ClusterIP
+              externalPort: 8075
+              internalPort: 8075
+              tls:
+                externalPort: 8076
+                internalPort: 8076
+            tls:
+              enabled: false
+          minio:
+            enabled: true
+            credentials: {}
+          grafana:
+            enabled: false
+          appConfig:
+            enableUsagePing: true
+            enableSeatLink: true
+            defaultCanCreateGroup: true
+            usernameChangingEnabled: true
+            defaultProjectsFeatures:
+              issues: true
+              mergeRequests: true
+              wiki: true
+              snippets: true
+              builds: true
+            webhookTimeout:
+            maxRequestDurationSeconds:
+            contentSecurityPolicy:
+              enabled: false
+              report_only: true
+            gravatar:
+              plainUrl:
+              sslUrl:
+            extra:
+              googleAnalyticsId:
+              matomoUrl:
+              matomoSiteId:
+            object_store:
+              enabled: false
+              proxy_download: true
+              storage_options: {}
+              connection: {}
+            lfs:
+              enabled: true
+              proxy_download: true
+              bucket: git-lfs
+              connection: {}
+            artifacts:
+              enabled: true
+              proxy_download: true
+              bucket: gitlab-artifacts
+              connection: {}
+            uploads:
+              enabled: true
+              proxy_download: true
+              bucket: gitlab-uploads
+              connection: {}
+            packages:
+              enabled: true
+              proxy_download: true
+              bucket: gitlab-packages
+              connection: {}
+            externalDiffs:
+              enabled: false
+              when:
+              proxy_download: true
+              bucket: gitlab-mr-diffs
+              connection: {}
+            terraformState:
+              enabled: false
+              bucket: gitlab-terraform-state
+              connection: {}
+            dependencyProxy:
+              enabled: false
+              proxy_download: true
+              bucket: gitlab-dependency-proxy
+              connection: {}
+            pseudonymizer:
+              configMap:
+              bucket: gitlab-pseudo
+              connection: {}
+            backups:
+              bucket: gitlab-backups
+              tmpBucket: tmp
+            incomingEmail:
+              enabled: false
+            serviceDeskEmail:
+              enabled: false
+            ldap:
+              preventSignin: false
+              servers: {}
+            gitlab_kas: {}
+            omniauth:
+              enabled: false
+            sentry:
+              enabled: false
+            smartcard:
+              enabled: false
+            initialDefaults: {}
+          geo:
+            enabled: false
+            role: primary
+            nodeName: # defaults to `gitlab.gitlab.host`
+            psql:
+              password: {}
+          kas:
+            enabled: false
+          shell:
+            authToken: {}
+            hostKeys: {}
+          railsSecrets: {}
+          rails:
+            bootsnap: # Enable / disable Shopify/Bootsnap cache
+              enabled: true
+          registry:
+            bucket: registry
+          pages:
+            enabled: false
+          runner:
+            registrationToken: {}
+          smtp:
+            enabled: false
+          email:
+            display_name: GitLab
+          time_zone: EST
+          service:
+            labels: {}
+            annotations: {}
+          deployment:
+            annotations: {}
+          antiAffinity: soft
+          workhorse:
+            serviceName: webservice-default
+          webservice:
+            workerTimeout: 60
+          certificates:
+            image:
+              repository: registry.gitlab.com/gitlab-org/build/cng/alpine-certificates
+              tag: 20191127-r2
+          kubectl:
+            image:
+              repository: registry.gitlab.com/gitlab-org/build/cng/kubectl
+              tag: 1.13.12
+              pullSecrets: []
+            securityContext:
+              runAsUser: 65534
+              fsGroup: 65534
+          busybox:
+            image:
+              repository: busybox
+              tag: latest
+          serviceAccount:
+            enabled: false
+            create: true
+            annotations: {}
+          tracing:
+            connection:
+          extraEnv: {}
+
+        upgradeCheck:
+          enabled: false
+          image: {}
+          securityContext:
+            runAsUser: 65534
+            fsGroup: 65534
+          tolerations: []
+          resources:
+            requests:
+              cpu: 50m
+
+        certmanager:
+          install: false
+        certmanager-issuer:
+          email: daniel.a.manners@gmail.com
+        nginx-ingress:
+          enabled: false
+
+        prometheus:
+          install: true
+          rbac:
+            create: true
+          alertmanager:
+            enabled: false
+          alertmanagerFiles:
+            alertmanager.yml: {}
+          kubeStateMetrics:
+            enabled: false
+          nodeExporter:
+            enabled: false
+          pushgateway:
+            enabled: false
+          server:
+            retention: 7d
+          serverFiles:
+            prometheus.yml:
+              scrape_configs:
+                - job_name: prometheus
+                  static_configs:
+                    - targets:
+                      - localhost:9090
+                - job_name: 'kubernetes-apiservers'
+                  kubernetes_sd_configs:
+                    - role: endpoints
+                  scheme: https
+                  tls_config:
+                    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                    insecure_skip_verify: true
+                  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+                      action: keep
+                      regex: default;kubernetes;https
+                - job_name: 'kubernetes-pods'
+                  kubernetes_sd_configs:
+                    - role: pod
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_pod_annotation_gitlab_com_prometheus_scrape]
+                      action: keep
+                      regex: true
+                    - source_labels: [__meta_kubernetes_pod_annotation_gitlab_com_prometheus_path]
+                      action: replace
+                      target_label: __metrics_path__
+                      regex: (.+)
+                    - source_labels: [__address__, __meta_kubernetes_pod_annotation_gitlab_com_prometheus_port]
+                      action: replace
+                      regex: ([^:]+)(?::\d+)?;(\d+)
+                      replacement: $1:$2
+                      target_label: __address__
+                    - action: labelmap
+                      regex: __meta_kubernetes_pod_label_(.+)
+                    - source_labels: [__meta_kubernetes_namespace]
+                      action: replace
+                      target_label: kubernetes_namespace
+                    - source_labels: [__meta_kubernetes_pod_name]
+                      action: replace
+                      target_label: kubernetes_pod_name
+                - job_name: 'kubernetes-service-endpoints'
+                  kubernetes_sd_configs:
+                    - role: endpoints
+                  relabel_configs:
+                    - action: keep
+                      regex: true
+                      source_labels:
+                        - __meta_kubernetes_service_annotation_gitlab_com_prometheus_scrape
+                    - action: replace
+                      regex: (https?)
+                      source_labels:
+                        - __meta_kubernetes_service_annotation_gitlab_com_prometheus_scheme
+                      target_label: __scheme__
+                    - action: replace
+                      regex: (.+)
+                      source_labels:
+                        - __meta_kubernetes_service_annotation_gitlab_com_prometheus_path
+                      target_label: __metrics_path__
+                    - action: replace
+                      regex: ([^:]+)(?::\d+)?;(\d+)
+                      replacement: $1:$2
+                      source_labels:
+                        - __address__
+                        - __meta_kubernetes_service_annotation_gitlab_com_prometheus_port
+                      target_label: __address__
+                    - action: labelmap
+                      regex: __meta_kubernetes_service_label_(.+)
+                    - action: replace
+                      source_labels:
+                        - __meta_kubernetes_namespace
+                      target_label: kubernetes_namespace
+                    - action: replace
+                      source_labels:
+                        - __meta_kubernetes_service_name
+                      target_label: kubernetes_name
+                    - action: replace
+                      source_labels:
+                        - __meta_kubernetes_pod_node_name
+                      target_label: kubernetes_node
+                - job_name: 'kubernetes-services'
+                  metrics_path: /probe
+                  params:
+                    module: [http_2xx]
+                  kubernetes_sd_configs:
+                    - role: service
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_service_annotation_gitlab_com_prometheus_probe]
+                      action: keep
+                      regex: true
+                    - source_labels: [__address__]
+                      target_label: __param_target
+                    - target_label: __address__
+                      replacement: blackbox
+                    - source_labels: [__param_target]
+                      target_label: instance
+                    - action: labelmap
+                      regex: __meta_kubernetes_service_label_(.+)
+                    - source_labels: [__meta_kubernetes_namespace]
+                      target_label: kubernetes_namespace
+                    - source_labels: [__meta_kubernetes_service_name]
+                      target_label: kubernetes_name
+
+        redis:
+          install: true
+          existingSecret: gitlab-redis-secret
+          existingSecretKey: redis-password
+          usePasswordFile: true
+          cluster:
+            enabled: false
+          metrics:
+            enabled: true
+
+        postgresql:
+          postgresqlUsername: gitlab
+          # This just needs to be set. It will use a second entry in existingSecret for postgresql-postgres-password
+          postgresqlPostgresPassword: bogus
+          install: true
+          postgresqlDatabase: gitlabhq_production
+          image:
+            tag: 11.9.0
+          usePasswordFile: true
+          existingSecret: 'bogus'
+          initdbScriptsConfigMap: 'bogus'
+          master:
+            extraVolumeMounts:
+              - name: custom-init-scripts
+                mountPath: /docker-entrypoint-preinitdb.d/init_revision.sh
+                subPath: init_revision.sh
+            podAnnotations:
+              postgresql.gitlab/init-revision: "1"
+          metrics:
+            enabled: true
+
+        shared-secrets:
+          enabled: false
+          rbac:
+            create: true
+
+        gitlab-runner:
+          install: true
+          rbac:
+            create: true
+          runners:
+            locked: false
+            cache:
+              cacheType: s3
+              s3BucketName: runner-cache
+              cacheShared: true
+              s3BucketLocation: us-east-1
+              s3CachePath: gitlab-runner
+              s3CacheInsecure: false
+          podAnnotations:
+            gitlab.com/prometheus_scrape: "true"
+            gitlab.com/prometheus_port: 9252
+
+        grafana:
+          admin:
+            existingSecret: bogus
+          env:
+            GF_SECURITY_ADMIN_USER: bogus
+            GF_SECURITY_ADMIN_PASSWORD: bogus
+          command: [ "sh", "-x", "/tmp/scripts/import-secret.sh" ]
+          sidecar:
+            dashboards:
+              enabled: true
+              label: gitlab_grafana_dashboard
+            datasources:
+              enabled: true
+              label: gitlab_grafana_datasource
+          grafana.ini:
+            server:
+              root_url: http://localhost/-/grafana/
+          extraSecretMounts:
+            - name: initial-password
+              mountPath: /tmp/initial
+              readOnly: true
+              secretName: gitlab-grafana-initial-password
+              defaultMode: 400
+          extraConfigmapMounts:
+            - name: import-secret
+              mountPath: /tmp/scripts
+              configMap: gitlab-grafana-import-secret
+              readOnly: true
+          testFramework:
+            enabled: false
+
+        # CUSTOM - Required for separately managed certmanager
+        registry:
+          ingress:
+            tls:
+              secretName: gitlab-registry-tls
+
+        # CUSTOM - Required for separately managed certmanager
+        minio:
+          ingress:
+            tls:
+              secretName: gitlab-minio-tls
+
+        # CUSTOM - Required for separately managed certmanager
+        gitlab:
+          gitlab-pages:
+            ingress:
+              tls:
+                secretName: gitlab-pages-tls
+          webservice:
+            ingress:
+              tls:
+                secretName: gitlab-webservice-tls
+          task-runner:
+            replicas: 1
+            antiAffinityLabels:
+              matchLabels:
+                app: 'gitaly'
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

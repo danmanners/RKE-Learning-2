@@ -1,0 +1,10 @@
+# Cert Directories
+certs/
+hostKeys/
+
+# Cert Files
+*.crt
+*.pem
+*.key
+*.pub
+ssh_host_*

@@ -1,0 +1,113 @@
+---
+### GitLab Webservice
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: gitlab-webservice-tls
+  namespace: gitlab
+spec:
+  commonName: gitlab.danmanners.io
+  secretName: gitlab-webservice-tls
+  dnsNames:
+    - gitlab.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gitlab
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`gitlab.danmanners.io`) && PathPrefix(`/admin/sidekiq`)
+      kind: Rule
+      services:
+        - name: gitlab-webservice-default
+          port: 8080
+    - match: Host(`gitlab.danmanners.io`)
+      kind: Rule
+      services:
+        - name: gitlab-webservice-default
+          port: 8181
+  tls:
+    secretName: gitlab-webservice-tls
+---
+### GitLab Minio
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: gitlab-minio-tls
+  namespace: gitlab
+spec:
+  commonName: minio.danmanners.io
+  secretName: gitlab-minio-tls
+  dnsNames:
+    - minio.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`minio.danmanners.io`)
+      kind: Rule
+      services:
+        - name: gitlab-minio-svc
+          port: 9000
+  tls:
+    secretName: gitlab-minio-tls
+---
+### GitLab Registry
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: gitlab-registry-tls
+  namespace: gitlab
+spec:
+  commonName: registry.danmanners.io
+  secretName: gitlab-registry-tls
+  dnsNames:
+    - registry.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: registry
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`registry.danmanners.io`)
+      kind: Rule
+      services:
+        - name: gitlab-registry
+          port: 5000
+  tls:
+    secretName: gitlab-registry-tls
+---
+### GitLab Pages Wildcard
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: gitlab-pages-tls
+  namespace: gitlab
+spec:
+  commonName: "*.gitlab.danmanners.io"
+  secretName: gitlab-pages-tls
+  dnsNames:
+    - "*.gitlab.danmanners.io"
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
