@@ -72,8 +72,12 @@ kubectl -n gitlab create secret generic gitlab-gitlab-workhorse-secret \
 
 # GitLab Runner
 kubectl -n gitlab create secret generic gitlab-gitlab-runner-secret \
-    --from-literal=runner-registration-token=$(head -c 512 /dev/urandom | LC_CTYPE=C tr -cd 'a-zA-Z0-9' | head -c 64)\
-    --from-literal=runner-token=""
+    --from-literal=runner-registration-token=$(head -c 512 /dev/urandom | LC_CTYPE=C tr -cd 'a-zA-Z0-9' | head -c 64) \
+    --from-literal=runner-token="5oTLJS47SrUAuL5Lznc1DL0IwzcqbHLkq9PLwi0xdJ0PiVSjjq0M9js5tmMwOysn"
+
+kubectl -n gitlab create secret generic gitlab-gitlab-runner-secret \
+    --from-literal=runner-registration-token=$(head -c 512 /dev/urandom | LC_CTYPE=C tr -cd 'a-zA-Z0-9' | head -c 64) \
+    --from-literal=runner-token="5oTLJS47SrUAuL5Lznc1DL0IwzcqbHLkq9PLwi0xdJ0PiVSjjq0M9js5tmMwOysn"
 
 # GitLab Registry HTTP Secret
 kubectl -n gitlab create secret generic gitlab-registry-httpsecret \
@@ -105,3 +109,7 @@ kubectl -n gitlab create secret generic gitlab-registry-httpsecret \
 kubectl -n gitlab create secret generic gitlab-praefect-dbsecret \
     --from-literal=secret=$(head -c 512 /dev/urandom | LC_CTYPE=C tr -cd 'a-zA-Z0-9' | head -c 64)
 ```
+
+## Troubleshooting GitLab Runner
+
+[See this link for up-to-date troubleshooting steps](https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/doc/troubleshooting/index.md#included-gitlab-runner-failing-to-register). It's most likely that you need to simply update the runner token.
