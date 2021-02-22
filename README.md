@@ -60,3 +60,10 @@ $ kubectl exec -it jenkins-ce-0 -- /bin/cat /var/jenkins_home/secrets/initialAdm
 $ kubectl apply -f Nexus-OSS/sts.yaml -f Nexus-OSS/ingress.yaml
 $ kubectl exec -it nexus-oss-0 -- /bin/cat /nexus-data/admin.password
 ```
+
+After running through the initialization steps in the [GitLab README](Gitlab/README.md) and the [SonarQube README](Sonarqube/README.md), you can also install GitLab-EE and SonarQube!
+
+```bash
+# Installing Gitlab & SonarQube through Argo
+$ kubectl apply -f ArgoCD/projects.yaml
+```
