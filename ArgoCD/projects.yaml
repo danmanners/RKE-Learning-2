@@ -29,7 +29,7 @@ spec:
     source:
         repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
         path: Gitlab
-        targetRevision: Gitlab
+        targetRevision: HEAD
     destination:
         server: 'https://kubernetes.default.svc'
         namespace: gitlab

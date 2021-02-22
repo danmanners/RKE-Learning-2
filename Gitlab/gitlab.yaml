@@ -46,7 +46,7 @@ spec:
             smartcard: {}
             kas: {}
           ingress:
-            enabled: true
+            enabled: false
             configureCertmanager: false
             annotations: 
               kubernetes.io/tls-acme: true
@@ -488,6 +488,7 @@ spec:
                 secretName: gitlab-pages-tls
           webservice:
             ingress:
+              path: 
               tls:
                 secretName: gitlab-webservice-tls
           task-runner:
