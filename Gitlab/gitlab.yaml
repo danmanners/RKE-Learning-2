@@ -9,7 +9,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     repoURL: 'https://charts.gitlab.io/'
-    targetRevision: 4.8.4
+    targetRevision: 4.9.1
     chart: gitlab
     helm:
       valueFiles:
@@ -496,6 +496,9 @@ spec:
             antiAffinityLabels:
               matchLabels:
                 app: 'gitaly'
+          migrations:
+            enabled: true
+
   project: default
   syncPolicy:
     automated:
