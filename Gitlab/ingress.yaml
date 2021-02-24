@@ -21,6 +21,7 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - web
   routes:
     - match: Host(`gitlab.danmanners.io`) && PathPrefix(`/admin/sidekiq`)
       kind: Rule
@@ -32,6 +33,11 @@ spec:
       services:
         - name: gitlab-webservice-default
           port: 8181
+  middlewares:
+    - name: https-redirectscheme
+      namespace: default
+    - name: x-forwarded-for
+      namespace: default
   tls:
     secretName: gitlab-webservice-tls
 ---
