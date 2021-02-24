@@ -1,4 +1,46 @@
 ---
+## ArgoCD
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'argocd-projects'
+  namespace: argocd
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: ArgoCD
+        targetRevision: HEAD
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: default
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true
+---
+## Nexus
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'nexus-oss'
+  namespace: argocd
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: Nexus-OSS
+        targetRevision: HEAD
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: default
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true
+---
 ## Jenkins
 apiVersion: argoproj.io/v1alpha1
 kind: Application
