@@ -1,0 +1,91 @@
+USER-SUPPLIED VALUES:
+COMPUTED VALUES: null
+autoscaling:
+  enabled: false
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 1
+globalArguments:
+- --global.checknewversion
+- --global.sendanonymoususage
+hostNetwork: false
+image:
+  name: traefik
+  pullPolicy: IfNotPresent
+ingressClass:
+  enabled: false
+  isDefaultClass: false
+ingressRoute:
+  dashboard:
+    enabled: true
+logs:
+  access:
+    enabled: false
+  general:
+    level: ERROR
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  path: /data
+  size: 128Mi
+pilot:
+  enabled: false
+podDisruptionBudget:
+  enabled: false
+podSecurityContext:
+  fsGroup: 65532
+podSecurityPolicy:
+  enabled: false
+ports:
+  ssh:
+    expose: true
+    exposedPort: 22
+    port: 2222
+    protocol: TCP
+  traefik:
+    expose: false
+    exposedPort: 9000
+    port: 9000
+    protocol: TCP
+  web:
+    expose: true
+    exposedPort: 80
+    port: 8000
+    protocol: TCP
+  websecure:
+    expose: true
+    exposedPort: 443
+    port: 8443
+    protocol: TCP
+    tls: null
+    tlsOptions:
+priorityClassName: ""
+providers:
+  kubernetesCRD:
+    enabled: true
+    namespaces:
+    - default
+    - gitlab
+    - sonarqube
+  kubernetesIngress:
+    enabled: false
+    publishedService:
+      enabled: false
+rbac:
+  enabled: true
+  namespaced: false
+rollingUpdate:
+  maxSurge: 1
+  maxUnavailable: 1
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+service:
+  enabled: true
+  type: LoadBalancer

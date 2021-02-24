@@ -13,4 +13,5 @@ kind: Middleware
 metadata:
   name: x-forwarded-for
 spec:
-  hostsProxyHeaders: [ "X-Forwarded-For" ]
+  headers:
+    hostsProxyHeaders: [ "X-Forwarded-For" ]

@@ -51,25 +51,3 @@ spec:
           port: 5001
   tls:
     secretName: nexus-oss-cert
-# OLD Traefik v1.7x Ingress
-# ---
-# apiVersion: extensions/v1beta1
-# kind: Ingress
-# metadata:
-#   annotations:
-#     external-dns.alpha.kubernetes.io/hostname: nexus.danmanners.io
-#     kubernetes.io/ingress.class: traefik
-#   labels:
-#     run: nexus-oss
-#   name: nexus-oss-ingress
-#   namespace: default
-# spec:
-#   rules:
-#     - host: nexus.danmanners.io
-#       http:
-#         paths:
-#           - path: /
-#             pathType: ImplementationSpecific
-#             backend:
-#               serviceName: nexus-oss
-#               servicePort: 8081

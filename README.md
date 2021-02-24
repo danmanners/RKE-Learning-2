@@ -34,11 +34,11 @@ $ helm install longhorn longhorn/longhorn \
     --version 1.1.0
 $ kubectl apply -f Longhorn/ingress.yaml
 
-# Install Traefik v2
+# Install Traefik v2.4.5
 $ helm repo add traefik https://helm.traefik.io/traefik
 $ helm repo update
 $ helm install traefik traefik/traefik \
-    --version 9.12.3
+    --version 9.14.3 -f Traefik/values.yaml
 
 # Install Cert-Manager
 $ helm repo add jetstack https://charts.jetstack.io
@@ -46,7 +46,7 @@ $ kubectl create namespace cert-manager
 $ helm repo update
 $ helm install cert-manager jetstack/cert-manager \
     --namespace cert-manager \
-    --version v1.1.0 \
+    --version v1.2.0 \
     --set installCRDs=true
 
 # Set up Cert-Manager DigitalOcean DNS Issuer

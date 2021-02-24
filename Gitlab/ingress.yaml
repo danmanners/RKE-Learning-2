@@ -33,11 +33,9 @@ spec:
       services:
         - name: gitlab-webservice-default
           port: 8181
-  middlewares:
-    - name: https-redirectscheme
-      namespace: default
-    - name: x-forwarded-for
-      namespace: default
+      middlewares:
+        - name: https-redirectscheme
+          namespace: default
   tls:
     secretName: gitlab-webservice-tls
 ---
