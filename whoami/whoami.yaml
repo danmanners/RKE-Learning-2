@@ -2,7 +2,6 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  namespace: default
   name: whoami
   labels:
     app: whoami
@@ -55,11 +54,15 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - web
   routes:
     - match: Host(`whoami.danmanners.io`)
       kind: Rule
       services:
         - name: whoami
           port: 80
+      middlewares:
+        - name: https-redirectscheme
+          namespace: default
   tls:
     secretName: whoami-cert

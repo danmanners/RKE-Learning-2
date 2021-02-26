@@ -103,3 +103,24 @@ spec:
             prune: true
         syncOptions:
             - CreateNamespace=true
+---
+## Whoami
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'whoami-kustomization'
+  namespace: argocd
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: validation-apps
+        targetRevision: HEAD
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: default
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true
