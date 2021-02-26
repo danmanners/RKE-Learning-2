@@ -10,3 +10,7 @@ helm install traefik traefik/traefik \
 ```
 
 This should get Traefik up and going!
+
+# What are the other files
+
+The `commonMiddlewares.yaml` and `traefik-dashboard.yaml` files are to allow ingress access into the dashboard and to add the `http > https` redirect and `X-Forwarded-For` header middlewares.
