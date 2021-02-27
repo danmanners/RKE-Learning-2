@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - svc_unifi_controller_tcp.yaml
+  - svc_unifi_controller_udp.yaml
+  - traefik_ingress.yaml
+  - traefik_service.yaml
+
+commonLabels:
+  app: unifi-controller

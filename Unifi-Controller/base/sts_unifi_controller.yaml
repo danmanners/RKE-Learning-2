@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi-controller
+  labels:
+    app: unifi-controller
+    version: version-6.0.45
+    type: third-party
+    facing: internal
+spec:
+  serviceName: unifi-controller
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi-controller
+  template:
+    metadata:
+      labels:
+        app: unifi-controller
+    spec:
+      initContainers:
+        - name: unifi-controller-system-properties-injector
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'mkdir -p /data_dir/data && sed ''s/MONGODB_PASSWORD/''"$MONGODB_PASSWORD"''/g;s/LOAD_BALANCER_IP/''"$LOAD_BALANCER_IP"/g;'' /system.properties > /data_dir/data/system.properties',
+            ]
+          env:
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-controller-mongodb-password
+                  key: mongodb_password
+            - name: LOAD_BALANCER_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: unifi-controller-system-properties
+                  key: load_balancer_ip
+          volumeMounts:
+            - name: unifi-controller-system-properties
+              mountPath: /system.properties
+              subPath: system.properties
+            - name: unifi-controller-data
+              mountPath: /data_dir/
+      containers:
+        - name: unifi-controller
+          image: linuxserver/unifi-controller:5.9
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/New_York"
+          ports:
+            - name: "l2-discoverable"
+              containerPort: 1900
+              protocol: UDP
+            - name: "stun"
+              containerPort: 3478
+              protocol: UDP
+            - name: "ap-discovery"
+              containerPort: 10001
+              protocol: UDP
+            - name: "speed-test"
+              containerPort: 6789
+            - name: "internal-comms"
+              containerPort: 8080
+            - name: "unknown-port"
+              containerPort: 8081
+            - name: "http-web"
+              containerPort: 8443
+            - name: "http-s-redirect"
+              containerPort: 8843
+            - name: "http-redirect"
+              containerPort: 8880
+          volumeMounts:
+            - name: unifi-controller-data
+              mountPath: /config
+            - name: unifi-controller-backups
+              mountPath: /backups
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 8080
+            initialDelaySeconds: 360
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "0.02"
+            limits:
+              memory: "3072Mi"
+              cpu: "0.2"
+      volumes:
+        - name: unifi-controller-data
+          persistentVolumeClaim:
+            claimName: unifi-controller-data-unifi-controller-0
+        - name: unifi-controller-backups
+          persistentVolumeClaim:
+            claimName: unifi-controller-backups-unifi-controller-0
+        - name: unifi-controller-system-properties
+          configMap:
+            name: unifi-controller-system-properties
+  volumeClaimTemplates:
+    - metadata:
+        name: unifi-controller-data
+      spec:
+        accessModes: ["ReadWriteMany"]
+        resources:
+          requests:
+            storage: 10Gi
+    - metadata:
+        name: unifi-controller-backups
+      spec:
+        accessModes: ["ReadWriteMany"]
+        resources:
+          requests:
+            storage: 10Gi

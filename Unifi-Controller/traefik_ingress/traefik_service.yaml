@@ -1,0 +1,75 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-controller-traefik-ingress-tcp
+  namespace: default
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "true"
+  labels:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.55.0.11
+  selector:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik
+  ports:
+    - name: "unifi-speed-test"
+      protocol: TCP
+      targetPort: 6789
+      port: 6789
+    - name: "unifi-internal-comms"
+      protocol: TCP
+      targetPort: 8080
+      port: 8080
+    - name: "unifi-unknown-port"
+      protocol: TCP
+      targetPort: 8081
+      port: 8081
+    - name: "unifi-http-web"
+      protocol: TCP
+      targetPort: 8443
+      port: 8443
+    - name: "unifi-http-s-redirect"
+      protocol: TCP
+      targetPort: 8843
+      port: 8843
+    - name: "unifi-http-redirect"
+      protocol: TCP
+      targetPort: 8880
+      port: 8880
+    - name: "unifi-local-comms"
+      protocol: TCP
+      targetPort: 27117
+      port: 27117
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-controller-traefik-ingress-udp
+  namespace: default
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "true"
+  labels:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.55.0.11
+  selector:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik
+  ports:
+    - name: "unifi-l2-discoverable"
+      protocol: UDP
+      targetPort: 1900
+      port: 1900
+    - name: "unifi-stun"
+      protocol: UDP
+      targetPort: 3478
+      port: 3478
+    - name: "unifi-ap-discovery"
+      protocol: UDP
+      targetPort: 10001
+      port: 10001

@@ -7,8 +7,8 @@ deployment:
   kind: Deployment
   replicas: 1
 globalArguments:
-- --global.checknewversion
-- --global.sendanonymoususage
+  - --global.checknewversion
+  - --global.sendanonymoususage
 hostNetwork: false
 image:
   name: traefik
@@ -65,9 +65,9 @@ providers:
   kubernetesCRD:
     enabled: true
     namespaces:
-    - default
-    - gitlab
-    - sonarqube
+      - default
+      - gitlab
+      - sonarqube
   kubernetesIngress:
     enabled: false
     publishedService:
@@ -81,7 +81,7 @@ rollingUpdate:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   runAsGroup: 65532
   runAsNonRoot: true

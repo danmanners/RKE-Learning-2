@@ -1,0 +1,23 @@
+---
+# Add Registry credentials for the MongoDB container.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi-controller-mongodb
+spec:
+  serviceName: unifi-controller-mongodb
+  template:
+    spec:
+      imagePullSecrets: # Uncomment These lines if you want to use a registry credential.
+        - name: regcred # Uncomment These lines if you want to use a registry credential.
+---
+# Update the password for MongoDB Here
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-controller-mongodb-password
+data:
+  mongodb_password: "dW5pZmlfZGJfcGFzc3dvcmQ=" # < - Update this line
+  # Ensure that the password above is base64 encoded
+  # You can do this by running:
+  # echo 'mongodb_password_here' | base64

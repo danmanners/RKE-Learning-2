@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi-controller-mongodb
+  labels:
+    app: unifi-controller-mongodb
+    type: third-party
+    facing: internal
+spec:
+  serviceName: unifi-controller-mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "unifi-controller-mongodb"
+  template:
+    metadata:
+      labels:
+        app: unifi-controller-mongodb
+    spec:
+      initContainers:
+        - name: unifi-controller-mongo-injector
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'sed "s/MONGO_INITDB_ROOT_PASSWORD/\"$MONGO_INITDB_ROOT_PASSWORD\"/g;" /create_unifi_db.sh > /docker-entrypoint-initdb.d/create_unifi_db.sh',
+            ]
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "ubnt"
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-controller-mongodb-password
+                  key: mongodb_password
+          volumeMounts:
+            - name: unifi-controller-mongodb-config
+              mountPath: /create_unifi_db.sh
+              subPath: create_unifi_db.sh
+            - name: unifi-controller-mongodb-init
+              mountPath: /docker-entrypoint-initdb.d
+      containers:
+        - name: unifi-controller-mongodb
+          # The latest version supported by the Unifi Controller is 3.4.x
+          # image: bitnami/mongodb:3.6.22
+          image: mongo:3.4
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "ubnt"
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-controller-mongodb-password
+                  key: mongodb_password
+            - name: MONGO_INITDB_DATABASE
+              value: "unifi"
+          ports:
+            - name: "mongo-api"
+              containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - name: unifi-controller-mongodb
+              mountPath: /data/db
+            - name: unifi-controller-mongodb-init
+              mountPath: /docker-entrypoint-initdb.d
+              # mountPath: /docker-entrypoint-initdb.d/create_unifi_db.sh
+              # subPath: create_unifi_db.sh
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 1
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+          # securityContext:
+          #   runAsUser: 999
+          #   runAsGroup: 99
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "0.03"
+            limits:
+              memory: "3072Mi"
+              cpu: "0.2"
+      volumes:
+        - name: unifi-controller-mongodb-init
+          persistentVolumeClaim:
+            claimName: unifi-controller-mongodb-init-unifi-controller-mongodb-0
+        - name: unifi-controller-mongodb
+          persistentVolumeClaim:
+            claimName: unifi-controller-mongodb-unifi-controller-mongodb-0
+        - name: unifi-controller-mongodb-config
+          configMap:
+            name: unifi-controller-mongodb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: unifi-controller-mongodb
+      spec:
+        accessModes: ["ReadWriteMany"]
+        storageClassName: "longhorn-xfs"
+        resources:
+          requests:
+            storage: 10Gi
+    - metadata:
+        name: unifi-controller-mongodb-init
+      spec:
+        accessModes: ["ReadWriteMany"]
+        storageClassName: "longhorn-xfs"
+        resources:
+          requests:
+            storage: 10Mi

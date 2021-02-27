@@ -1,0 +1,28 @@
+---
+# StatefulSet - Unifi Controller
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi-controller
+spec:
+  template:
+    spec:
+      imagePullSecrets: # Uncomment These lines if you want to use a registry credential.
+      - name: regcred   # Uncomment These lines if you want to use a registry credential. 
+      containers:
+        - name: unifi-controller
+          env:
+            - name: PUID
+              value: "1000" # Put Your UID for your NFS Server here.
+            - name: PGID
+              value: "1000" # Put your GID for your NFS Server here.
+            - name: TZ
+              value: "America/New_York" # Put the correct time zone for your region here.
+---
+# ConfigMap - Set the Load Balancer IP Address
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unifi-controller-system-properties
+data:
+  load_balancer_ip: 10.55.0.11 # Update this IP to the IP you'll be hosting the Unifi Controller on.

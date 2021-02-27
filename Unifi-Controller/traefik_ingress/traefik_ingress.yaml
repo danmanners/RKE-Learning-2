@@ -1,0 +1,150 @@
+---
+# Unifi internal-comms
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-speed-test
+spec:
+  entryPoints:
+    - unifi-speed-test
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "speed-test"
+          port: 6789
+---
+# Unifi internal-comms
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-internal-comms
+spec:
+  entryPoints:
+    - unifi-internal-comms
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "internal-comms"
+          port: 8080
+---
+# Unifi Unknown Port
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-unknown-port
+spec:
+  entryPoints:
+    - unifi-unknown-port
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "unknown-port"
+          port: 8081
+---
+# Unifi HTTP Web
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-http-web
+spec:
+  entryPoints:
+    - unifi-http-web
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "http-web"
+          port: 8443
+---
+# Unifi HTTPS Redirection
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-http-s-redirect
+spec:
+  entryPoints:
+    - unifi-http-s-redirect
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "http-s-redirect"
+          port: 8843
+---
+# Unifi HTTP Redirection
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-http-redirect
+spec:
+  entryPoints:
+    - unifi-http-redirect
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "http-redirect"
+          port: 8880
+---
+# Unifi Local communication
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-local-comms
+spec:
+  entryPoints:
+    - unifi-local-comms
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "local-comms"
+          port: 27117
+---
+# Unifi L2 Discovery
+kind: IngressRouteUDP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-l2-discoverable
+spec:
+  entryPoints:
+    - unifi-l2-discoverable
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "l2-discoverable"
+          port: 1900
+---
+# Unifi STUN
+kind: IngressRouteUDP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-stun
+spec:
+  entryPoints:
+    - unifi-stun
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "stun"
+          port: 3478
+---
+# Unifi AP Discovery
+kind: IngressRouteUDP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: unifi-ap-discovery
+spec:
+  entryPoints:
+    - unifi-ap-discovery
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: "ap-discovery"
+          port: 10001

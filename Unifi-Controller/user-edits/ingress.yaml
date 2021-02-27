@@ -1,0 +1,24 @@
+# ---
+# #### UNIFI CONTROLLER - METALLB OVERRIDES - TCP SERVICE
+# #### You can ignore this section if not using the MetalLB Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: unifi-controller-tcp
+#   annotations:
+#     metallb.universe.tf/address-pool: 10.55.0.10 # Update this IP to the IP you'll be hosting the Unifi Controller on.
+# spec:
+#   type: LoadBalancer
+#   loadBalancerIP: 10.55.0.10 # Update this IP to the IP you'll be hosting the Unifi Controller on.
+# ---
+# #### UNIFI CONTROLLER - METALLB OVERRIDES - UDP SERVICE
+# #### You can ignore this section if not using the MetalLB Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: unifi-controller-udp
+#   annotations:
+#     metallb.universe.tf/address-pool: 10.55.0.10 # Update this IP to the IP you'll be hosting the Unifi Controller on.
+# spec:
+#   type: LoadBalancer
+#   loadBalancerIP: 10.55.0.10 # Update this IP to the IP you'll be hosting the Unifi Controller on.

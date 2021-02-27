@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: unifi-controller
+resources:
+  # MongoDB for Unifi Controller
+  - cm_unifi_controller_mongodb.yaml
+  - sec_unifi_controller_mongodb_password.yaml
+  - sts_unifi_controller_mongodb.yaml
+  - svc_unifi_controller_mongodb.yaml
+  # Unifi Controller
+  - cm_unifi_controller.yaml
+  - sts_unifi_controller.yaml
+commonLabels:
+  app: unifi-controller

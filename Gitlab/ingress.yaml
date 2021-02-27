@@ -115,3 +115,17 @@ spec:
   issuerRef:
     name: acme-prod
     kind: ClusterIssuer
+---
+kind: IngressRouteTCP
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: gitlab-ssh
+spec:
+  entryPoints:
+    - ssh
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: gitlab-gitlab-shell
+          port: 22
