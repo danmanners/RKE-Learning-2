@@ -133,12 +133,44 @@
         append: yes
       become: true
 
-- name: Ensure longhorn volumes are good to go
+- name: Ensure longhorn volumes are good to go and perform worker-specific tasks
   hosts: workers
   remote_user: centos
   tags:
     - longhorn
   tasks:
+    - name: Ensure elasticsearch values are set for the vm.max_map_count
+      ansible.posix.sysctl:
+        name: vm.max_map_count
+        value: '262144'
+        state: present
+        reload: yes
+      become: true
+
+    - name: Ensure elasticsearch values are set for the fs.file-max
+      ansible.posix.sysctl:
+        name: fs.file-max
+        value: '65536'
+        state: present
+        reload: yes
+      become: true
+
+    - name: set ulimit - open files
+      community.general.pam_limits:
+        domain: '*'
+        limit_type: '-'
+        limit_item: nofile
+        value: '65536'
+      become: true
+
+    - name: set ulimit - max user processes
+      community.general.pam_limits:
+        domain: '*'
+        limit_type: '-'
+        limit_item: nproc
+        value: '4096'
+      become: true
+
     - name: Create a new ext4 primary partition
       community.general.parted:
         device: /dev/sdb
