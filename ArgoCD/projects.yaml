@@ -124,3 +124,24 @@ spec:
             prune: true
         syncOptions:
             - CreateNamespace=true
+---
+## Bitnami Tools
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'bitnami-global'
+  namespace: argocd
+spec:
+    project: default
+    source:
+        repoURL: 'git@github.com:danmanners/RKE-Learning-2.git'
+        path: Bitnami
+        targetRevision: HEAD
+    destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: bitnami
+    syncPolicy:
+        automated:
+            prune: true
+        syncOptions:
+            - CreateNamespace=true
