@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kibana
+  namespace: argocd
+spec:
+  destination:
+    namespace: bitnami
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: "7.2.3"
+    chart: kibana
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        global:
+          imagePullSecrets:
+            - regcred
+          storageClass: longhorn-xfs
+        service:
+          type: ClusterIP
+        elasticsearch:
+          enabled: false
+          port: 9200
+          hosts: 
+            - elasticsearch-elasticsearch-data.bitnami.svc.kube.danmanners.io
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

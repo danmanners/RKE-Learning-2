@@ -1,0 +1,49 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: kibana-frontend-cert
+  namespace: bitnami
+spec:
+  commonName: kibana.danmanners.io
+  secretName: kibana-frontend-cert
+  dnsNames:
+    - kibana.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: allow-rfc1918
+  namespace: bitnami
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+---
+# BE INCREDIBLY CAREFUL WITH THIS. Don't expose it to the open internet, as this dashboard
+# IS FULL ADMIN ACCESS ONLY ! ! ! !
+# Don't say I didn't warn you.
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kibana-frontend
+  namespace: bitnami
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`kibana.danmanners.io`)
+      kind: Rule
+      services:
+        - name: kibana-frontend
+          port: 80
+      middlewares:
+        - name: allow-rfc1918
+          namespace: bitnami
+  tls:
+    secretName: kibana-frontend-cert
