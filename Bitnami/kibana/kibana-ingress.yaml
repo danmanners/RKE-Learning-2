@@ -40,8 +40,8 @@ spec:
     - match: Host(`kibana.danmanners.io`)
       kind: Rule
       services:
-        - name: kibana-frontend
-          port: 80
+        - name: kibana
+          port: 5601
       middlewares:
         - name: allow-rfc1918
           namespace: bitnami

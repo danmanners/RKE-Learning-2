@@ -1,0 +1,29 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: openfaas-cert
+spec:
+  commonName: openfaas.danmanners.io
+  secretName: openfaas-cert
+  dnsNames:
+    - openfaas.danmanners.io
+  issuerRef:
+    name: acme-prod
+    kind: ClusterIssuer
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openfaas
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`openfaas.danmanners.io`)
+      kind: Rule
+      services:
+        - name: gateway-external
+          port: 8080
+  tls:
+    secretName: openfaas-cert

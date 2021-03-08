@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - namespaces.yaml
 - argo-project.yaml
+- ingress.yaml

@@ -150,7 +150,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: 'openfaas'
+  name: 'openfaas-project'
   namespace: argocd
 spec:
     project: default
