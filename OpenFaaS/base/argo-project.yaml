@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 'openfaas'
+  namespace: argocd
+spec:
+  destination:
+    namespace: openfaas
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://openfaas.github.io/faas-netes/'
+    targetRevision: "7.2.2"
+    chart: openfaas
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        # Values
+        kubernetesDNSDomain: kube.danmanners.io
+        functionNamespace: openfaas-fn
+        exposeServices: true
+        async: true
+        serviceType: NodePort
+        httpProbe: true
+        rbac: true
+        clusterRole: false
+        createCRDs: true
+
+        # create pod security policies for OpenFaaS control plane
+        psp: true
+        securityContext: true
+        basic_auth: true
+
+        # image pull policy for openfaas components, can change to `IfNotPresent` in offline env
+        openfaasImagePullPolicy: "Always"
+
+        ## OSS components
+        nodeSelector:
+          beta.kubernetes.io/arch: amd64
+
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
